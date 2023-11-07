@@ -1,71 +1,217 @@
-IncludeScript("demo/utils")
+IncludeScript("pcapture/pcapture-lib/pcapture-lib")
+
+cam <- entLib.CreateByClassname("point_viewcontrol", {targetname = "camera"})
+pseudoHud <- entLib.CreateByClassname("game_text", {
+    channel = 2,
+    color = "170 170 170",
+    color2 = "240 110 0",
+    effect = 0,
+    fadein = 0,
+    fadeout = 0,
+    fxtime = 0,
+    holdtime = 100,
+    x = 0.01,
+    y = 0.95,
+    spawnflags = 0,
+    message = "Selected preset: 1"
+})
 
 keypoints <- [] // список ключевых точек для камеры
-isRecording <- true // true - включить запись / false - выключить
-currentKey <- 0  // индекс текущей точки
-progress <- 0 // прогресс от 0 до 1 между двумя точками 
-progress_speed <- 0.001 // скорость прогресса
+presedList <- arrayLib.new()
+CurrentPreset <- 0
+isRecording <- false // true - включить запись / false - выключить
+
+cameraSpeed <- 0.4
 
 function AddKeyPoint()
 {
-    keypoints.append( {origin=EyePos(),angles=EyeAngles()} ) // добавить новую точку с текущим положением и углом глаз
-    log("Create new key: origin- "+EyePos()+", angles- "+EyeAngles())
+    local origin = GetPlayer().EyePosition()
+    local angle = ::eyePointEntity.GetAngles()
+    local forward = ::eyePointEntity.GetForwardVector()
+    keypoints.append( {
+        origin = origin,
+        angle = angle,
+        forward = forward,
+    } ) 
+    dev.log("Create new key: origin- " + origin + ", angles- " + angle)
 }
 
-function StartPlaying( linear )
-{
-    // SC("exec screenshot") TODO
-    EntFire("camera","Enable") // включить камеру
-    isRecording = false
-    progress=0
-    currentKey=0
-    SetCameraPosition( linear ) // установить позицию камеры в зависимости от режима
-    camera.SetOrigin(keypoints[currentKey].origin) // установить начальную позицию камеры
-    SetAnglesV(camera,keypoints[currentKey].angles) // установить начальный угол камеры
-}
-
-function SetCameraPosition(mode) // mode - true - линейное движение; false - плавное движение
-{
-    if(currentKey!=keypoints.len()-1 && !isRecording) // если не достигнута последняя точка
-    {
-        if(TraceGetDist(camera.GetOrigin(),keypoints[currentKey+1].origin)<1) // если расстояние до следующей точки меньше 1
-        {
-            currentKey++ // перейти к следующей точке
-            progress=0 // сбросить прогресс
+function export(name = "test") {
+    result <- "importKeyPoints(["
+    foreach(arr in presedList.arr) {
+        result += "\n\t["
+        foreach(elements in arr) {
+            result += "\n\t\t{"
+            foreach(keyname, keyinfo in elements) {
+                result += keyname + " = " + format("Vector(%f, %f, %f)", keyinfo.x, keyinfo.y, keyinfo.z) + ", "
+            }
+            result = result.slice(0, -2) + "}"
         }
-
-        progress += progress_speed
-        camera.SetOrigin( lerpVector(keypoints[currentKey].origin, keypoints[currentKey+1].origin,progress) ) // линейно интерполировать позицию камеры между двумя точками
-        
-        local q1 = Quaternion().new(keypoints[currentKey].angles)
-        local q2 = Quaternion().new(keypoints[currentKey+1].angles)
-        local slerp = q1.slerp(q2, progress).toVector()
-        
-        SetAnglesV(camera, slerp) // линейно интерполировать угол камеры между двумя точками
-        
-        script_delay("SetCameraPosition("+mode+")", FrameTime()) // повторить функцию через время кадра
+        result += "\n], "
     }
-    else 
-    {
-        isRecording = true; 
-        log("DISABLE");
-        EntFire("camera", "Disable")
-        SC("exec screenshot_off")
-    }
+    result += "\n])"
+    
+    SendToConsole(format("con_logfile scripts/vscripts/demo_export_%s.log", name))
+    SendToConsole("script printl(result)")
+    SendToConsole("con_logfile off")
+    // SendToConsole("clear; echo Done! :>")
 }
+
+function importKeyPoints(keyPoints) {
+    print(keyPoints.len())
+    presedList = arrayLib(keyPoints)
+    keypoints = presedList[0]
+}
+
+function DeleteLastPoint() {
+    keypoints.pop()
+}
+
+function DeleteAllPoint() {
+    keypoints.clear()
+}
+
+function StartPlaying() {
+    // SendToConsole("DEMO_HideHud")
+    EntFire("camera", "Enable")
+    isRecording = true
+    SetCameraPosition() 
+}
+
+function EndPlaying() {
+    printl(("DISABLE"))
+    SendToConsole("DEMO_ShowHud")
+    EntFire("camera", "Disable")
+    isRecording = false
+    DrawKey()
+    if(eventIsValid("camera")) cancelScheduledEvent("camera")
+}
+
+function StopPlaying() {
+    EndPlaying()
+}
+
+function createPreset() {
+    if(presedList.search(keypoints) == null)
+        presedList.append(keypoints)
+    CurrentPreset = presedList.len() -1
+    keypoints <- []
+    presedList.append(keypoints)
+    // CurrentPreset = CurrentPreset + 1
+    changePreset()
+}
+
+function changePreset() {
+    local Currentindex = CurrentPreset
+
+    foreach(index, info in presedList.arr){ // TODO BIG PROBLEM: NO _nexti
+        if (index > Currentindex) {
+            CurrentPreset = index
+            break
+        }
+    }
+    if(CurrentPreset == Currentindex) {
+        CurrentPreset = 0
+    }
+    pseudoHud.SetKeyValue("message", "Selected preset: " + (CurrentPreset + 1))
+    keypoints = presedList[CurrentPreset]
+}
+
+function SetCameraPosition() {
+    if(keypoints.len() < 1) 
+        return EndPlaying()
+
+    local start = keypoints[0]
+    local end = keypoints[1]
+
+    local infoTable = {
+        startKey = 0,
+        endKey = 1,
+        totalStep = getTotalStep(start, end),
+        currentStep = 0,
+        shortestOrigin = getShortestOrigin(start.origin, end.origin),
+        shortestAngle = getShortestAngle(start.angle, end.angle),
+    }
+
+    fuckingRecursive(infoTable)
+}
+
 
 function DrawKey()
 {
-    script_delay("DrawKey()", 0.2)
-    if(!isRecording || keypoints.len()==0) return
+    RunScriptCode.delay("DrawKey()", 0.05)
+    EntFireByHandle(pseudoHud, "Display")
+    if(isRecording || keypoints.len() == 0) 
+        return
+
     foreach (k,vector in keypoints) {
         vector = vector.origin
-        DebugDrawBox(vector,Vector(4,4,4),Vector(-4,-4,-4), 171, 214, 213, 100, 0.25)
-        if(k!=0 && k!=keypoints.len()) DebugDrawLine(keypoints[k-1].origin, vector, 224, 216, 232, false, 0.25)
+        DebugDrawBox(vector, Vector(4,4,4), Vector(-4,-4,-4), 171, 214, 213, 100, 0.1)
+        if(k != 0 && k != keypoints.len()) 
+            DebugDrawLine(keypoints[k-1].origin, vector, 224, 216, 232, false, 0.1)
     }
-    DebugDrawLine(keypoints.top().origin, EyePos(), 50, 216, 0, false, 0.25)
-    log(TraceGetDist(EyePos(),keypoints.top().origin))
 }
+
 DrawKey()
 
-SC("sv_alternateticks 0")
+SendToConsole("sv_alternateticks 0")
+
+
+function fuckingRecursive(infoTable) {
+    local runAgain = function(infoTable) {
+        CreateScheduleEvent("camera", function():(infoTable) {fuckingRecursive(infoTable)}, FrameTime())
+    }
+
+    foreach(k, i in infoTable) print(k +" = " + i +", ")
+    printl("")
+    if(infoTable.currentStep == infoTable.totalStep) {
+        if(infoTable.endKey == keypoints.len() - 1) {
+            return EndPlaying()
+        }
+
+        local start = keypoints[infoTable.startKey + 1]
+        local end = keypoints[infoTable.endKey + 1]
+        infoTable = {
+            startKey = infoTable.startKey + 1,
+            endKey = infoTable.endKey + 1,
+            totalStep = getTotalStep(start, end),
+            currentStep = 0,
+            shortestOrigin = getShortestOrigin(start.origin, end.origin),
+            shortestAngle = getShortestAngle(start.angle, end.angle),
+        }
+        return runAgain(infoTable)
+    }
+
+    local start = keypoints[infoTable.startKey]
+    local end = keypoints[infoTable.endKey]
+
+    local amount = infoTable.currentStep / infoTable.totalStep
+    local newPosition = start.origin + infoTable.shortestOrigin * amount;
+    local newAngle = start.angle + infoTable.shortestAngle * amount;    
+    
+    cam.SetOrigin(newPosition)
+    cam.SetAbsAngles(newAngle)
+
+    infoTable["currentStep"] = infoTable["currentStep"] + 1 
+    return runAgain(infoTable)
+}
+
+
+function getShortestOrigin(startOrigin, endOrigin) {
+    return Vector(endOrigin.x - startOrigin.x, 
+                  endOrigin.y - startOrigin.y,
+                  endOrigin.z - startOrigin.z)
+}
+
+function getShortestAngle(startAngles, endAngles) {
+    local shortest_angle_x = ((((endAngles.x - startAngles.x) % 360) + 540) % 360) - 180;
+    local shortest_angle_y = ((((endAngles.y - startAngles.y) % 360) + 540) % 360) - 180;
+    local shortest_angle_z = ((((endAngles.z - startAngles.z) % 360) + 540) % 360) - 180;
+    return Vector(shortest_angle_x, shortest_angle_y, shortest_angle_z)
+}
+
+function getTotalStep(start, end) {
+    local distance = end.origin - start.origin
+    local totalStep = abs(distance.Length() / cameraSpeed)
+    return totalStep.tofloat()
+}
