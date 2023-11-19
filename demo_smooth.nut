@@ -20,6 +20,7 @@ keypoints <- [] // список ключевых точек для камеры
 presedList <- arrayLib.new()
 CurrentPreset <- 0
 isRecording <- false // true - включить запись / false - выключить
+playAllPreset <- false
 
 cameraSpeed <- 0.4
 
@@ -72,10 +73,20 @@ function DeleteAllPoint() {
 }
 
 function StartPlaying() {
-    // SendToConsole("DEMO_HideHud")
+    SendToConsole("DEMO_HideHud")
     EntFire("camera", "Enable")
     isRecording = true
     SetCameraPosition() 
+}
+
+function StartPlayingAllPresets() {
+    if(presedList.len() > 0) {
+        CurrentPreset = 0
+        keypoints = presedList[CurrentPreset]
+        playAllPreset = true
+    }
+
+    StartPlaying() 
 }
 
 function EndPlaying() {
@@ -83,7 +94,6 @@ function EndPlaying() {
     SendToConsole("DEMO_ShowHud")
     EntFire("camera", "Disable")
     isRecording = false
-    DrawKey()
     if(eventIsValid("camera")) cancelScheduledEvent("camera")
 }
 
@@ -162,10 +172,14 @@ function fuckingRecursive(infoTable) {
         CreateScheduleEvent("camera", function():(infoTable) {fuckingRecursive(infoTable)}, FrameTime())
     }
 
-    foreach(k, i in infoTable) print(k +" = " + i +", ")
-    printl("")
+    // foreach(k, i in infoTable) print(k +" = " + i +", ")
+    // printl("")
     if(infoTable.currentStep == infoTable.totalStep) {
         if(infoTable.endKey == keypoints.len() - 1) {
+            if(playAllPreset && CurrentPreset < presedList.len() - 1) {
+                changePreset()
+                return SetCameraPosition()
+            }
             return EndPlaying()
         }
 
