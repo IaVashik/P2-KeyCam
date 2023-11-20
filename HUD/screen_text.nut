@@ -5,7 +5,7 @@ class screenText {
         this.CBaseEntity = entLib.CreateByClassname("game_text", {
             channel = 2,
             color = "170 170 170",
-            color2 = "240 110 0",
+            color2 = "0 0 0",
             effect = 0,
             fadein = 0,
             fadeout = 0,
@@ -37,4 +37,5 @@ function screenText::disable() {
 
 function screenText::changeText(message) {
     this.CBaseEntity.SetKeyValue("message", message)
+    this.enable()
 }
