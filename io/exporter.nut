@@ -1,6 +1,6 @@
 function export(name = "test") {
     result <- "importKeyPoints(["
-    foreach(arr in presedList.arr) {
+    foreach(arr in profiles) {
         result += "\n\t["
         foreach(elements in arr) {
             result += "\n\t\t{"

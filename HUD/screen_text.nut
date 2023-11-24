@@ -11,10 +11,11 @@ class screenText {
             fadeout = 0,
             fxtime = 0,
             holdtime = 100,
-            x = 0.01,
-            y = 0.95,
+            x = xPos,
+            y = yPos,
             spawnflags = 0,
-            message = "Selected Profile: 1"
+            message = message,
+            targetname = "cucumber"
         })
     }
 
@@ -28,7 +29,7 @@ class screenText {
 
 
 function screenText::enable() {
-    EntFireByHandle(this.CBaseEntity, "Enable")
+    EntFireByHandle(this.CBaseEntity, "Display")
 }
 
 function screenText::disable() {

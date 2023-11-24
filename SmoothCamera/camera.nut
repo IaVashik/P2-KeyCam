@@ -1,7 +1,5 @@
-IncludeScript("SmoothCamera/profile")
-IncludeScript("SmoothCamera/keyframes")
-IncludeScript("HUD/screen_text")
-IncludeScript("HUD/viewport")
+IncludeScript("P2-KeyCam/SmoothCamera/profile")
+IncludeScript("P2-KeyCam/SmoothCamera/keyframes")
 
 class keyCamera {
     profiles = arrayLib.new();
@@ -11,14 +9,14 @@ class keyCamera {
     currentProfileIdx = null;
     playAllProfile = false
 
-    screenText = null;
+    _screenText = null;
 
     constructor() {
         this.cameraEnt = entLib.CreateByClassname("point_viewcontrol")
+        this._screenText = screenText(0.01, 0.95, "Selected Profile: 1")
         this.createProfile()
-        this.screenText = screenText(0.01, 0.95, "Selected Profile: 1")
 
-        this.screenText.enable()
+        this._screenText.enable()
         this.startDrawFrames()
     }
 
@@ -26,11 +24,11 @@ class keyCamera {
     function deleteKey(idx) {}
     function deleteLastKey() {}
     function clearKeyframes() {}
-    
+
     function playCurrentProfile() {}
     function playAllProfiles() {}
     function stopPlayback() {}
-    
+
     function createProfile() {}
     function switchProfile() {}
 
@@ -43,6 +41,9 @@ class keyCamera {
     function _DrawFrames() {}
 }
 
+IncludeScript("P2-KeyCam/HUD/screen_text")
+IncludeScript("P2-KeyCam/HUD/viewport")
+
 /******************************************************************************
 *                            TODO BLYAT
 ******************************************************************************/
@@ -52,7 +53,7 @@ function keyCamera::addKeyframe() {
     local angle = eyePointEntity.GetAngles()
     local forward = eyePointEntity.GetForwardVector()
     local key = keyframe(origin, angle, forward)
-    
+
     this.currentProfile.addFrame(key)
 }
 
@@ -74,7 +75,7 @@ function keyCamera::clearKeyframes() {
 
 function keyCamera::playCurrentProfile() {
     this.endDrawFrames()
-    this.screenText.disable()
+    this._screenText.disable()
 
     SendToConsole("DEMO_HideHud")
     EntFireByHandle(this.cameraEnt, "Enable")
@@ -88,11 +89,11 @@ function keyCamera::playAllProfiles() {
 
 function keyCamera::stopPlayback() {
     this.startDrawFrames()
-    this.screenText.enable()
+    this._screenText.enable()
 
     playAllProfile = false
     SendToConsole("DEMO_ShowHud")
-    EntFireByHandle(this.cameraEnt, "Disable") 
+    EntFireByHandle(this.cameraEnt, "Disable")
     if(eventIsValid("camera")) cancelScheduledEvent("camera")
 }
 
@@ -102,6 +103,7 @@ function keyCamera::stopPlayback() {
 
 function keyCamera::createProfile() {
     local newProfile = camProfile(this.cameraSpeed)
+    currentProfile = newProfile;
     profiles.append(newProfile)
     this.switchProfile()
 }
@@ -109,9 +111,9 @@ function keyCamera::createProfile() {
 function keyCamera::switchProfile() {
     local Currentindex = currentProfileIdx
 
-    foreach(index, info in presedList.arr){ //! BIG PROBLEM: NO _nexti
+    foreach(index, info in this.profiles){ //! BIG PROBLEM: NO _nexti
         if (index > Currentindex) {
-            CurrentProfileIdx = index
+            this.currentProfileIdx = index
             break
         }
     }
@@ -119,8 +121,8 @@ function keyCamera::switchProfile() {
         currentProfileIdx = 0
     }
 
-    this.currentProfile = profiles[]
-    this.screenText.changeText("Selected Profile: " + (currentProfileIdx + 1))
+    this.currentProfile = profiles[currentProfileIdx]
+    this._screenText.changeText("Selected Profile: " + (currentProfileIdx + 1))
 }
 
 
@@ -129,16 +131,16 @@ function keyCamera::switchProfile() {
 ******************************************************************************/
 
 function keyCamera::_startAnim() {
-    if(keypoints.len() < 1) 
+    if(currentProfile.getFramesLen() < 1)
         return this.stopPlayback()
 
-    local start = CurrentProfile.getFrame(0)
-    local end = CurrentProfile.getFrame(1)
+    local start = currentProfile.getFrame(0)
+    local end = currentProfile.getFrame(1)
 
     local infoTable = {
         startKey = 0,
         endKey = 1,
-        totalStep = utils.getTotalStep(start, end),
+        totalStep = utils.getTotalStep(start, end, this.currentProfile.getSpeed()),
         currentStep = 0,
         shortestOrigin = utils.getShortestOrigin(start.origin, end.origin),
         shortestAngle = utils.getShortestAngle(start.angle, end.angle),
@@ -155,9 +157,9 @@ function keyCamera::_cameraRecursion(infoTable) {
 
     if(infoTable.currentStep == infoTable.totalStep) {
         if(infoTable.endKey == currentProfile.getFramesLen() - 1) {
-            if(this.playAllProfile && currentProfileIdx < CurrentProfile.len() - 1) {
+            if(this.playAllProfile && currentProfileIdx < currentProfile.len() - 1) {
                 this.switchProfile()
-                return this. // TODO !!!!
+                return this._startAnim()
             }
             return this.stopPlayback()
         }
@@ -169,7 +171,7 @@ function keyCamera::_cameraRecursion(infoTable) {
         infoTable = {
             startKey = currentIdx + 1,
             endKey = currentIdx + 2,
-            totalStep = utils.getTotalStep(start, end),
+            totalStep = utils.getTotalStep(start, end, this.currentProfile.getSpeed()),
             currentStep = 0,
             shortestOrigin = utils.getShortestOrigin(start.origin, end.origin),
             shortestAngle = utils.getShortestAngle(start.angle, end.angle),
@@ -183,11 +185,11 @@ function keyCamera::_cameraRecursion(infoTable) {
 
     local amount = infoTable.currentStep / infoTable.totalStep
     local newPosition = start.origin + infoTable.shortestOrigin * amount;
-    local newAngle = start.angle + infoTable.shortestAngle * amount;    
-    
+    local newAngle = start.angle + infoTable.shortestAngle * amount;
+
     this.cameraEnt.SetOrigin(newPosition)
     this.cameraEnt.SetAbsAngles(newAngle)
 
-    infoTable["currentStep"] = infoTable["currentStep"] + 1 
+    infoTable["currentStep"] = infoTable["currentStep"] + 1
     return runAgain(infoTable)
 }

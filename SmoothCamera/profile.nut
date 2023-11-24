@@ -1,12 +1,11 @@
 class camProfile {
-    keyframes = arrayLib.new();
+    keyframes = null;
     cameraSpeed = 1;
 
     constructor(speed) {
-        this.cameraSpeed = speed
+        this.keyframes = arrayLib.new();
+        this.cameraSpeed = speed;
     }
-
-    function len() {return keyframes.len()}
 
     function addFrame(keyframe) {}
 
@@ -16,28 +15,34 @@ class camProfile {
 
     function removeFrame(idx) {}
 
-    function clearKeyframes() {}
+    function clearFrames() {}
+
+    function getSpeed() {}
 
     // function changeKeyframe() {}
 }
 
 
-function profile::addKeyframe(keyframe) {
+function camProfile::addFrame(keyframe) {
     this.keyframes.append(keyframe)
 }
 
-function profile::getFrame(idx) {
+function camProfile::getFrame(idx) {
     return this.keyframes[idx]
 }
 
-function profile::removeFrame(idx) {
+function camProfile::removeFrame(idx) {
     this.keyframes.remove(idx)
 } 
 
-function profile::clearFrames() {
+function camProfile::clearFrames() {
     this.keyframes.clear()
 } 
 
-function profile::getFramesLen() {
+function camProfile::getFramesLen() {
     return this.keyframes.len()
+}
+
+function camProfile::getSpeed() {
+    return this.cameraSpeed
 }

@@ -13,7 +13,7 @@ utils <- {
         return Vector(shortest_angle_x, shortest_angle_y, shortest_angle_z)
     },
 
-    getTotalStep = function(start, end) {
+    getTotalStep = function(start, end, cameraSpeed) {
         local distance = end.origin - start.origin
         local totalStep = abs(distance.Length() / cameraSpeed)
         return totalStep.tofloat()
@@ -22,5 +22,6 @@ utils <- {
     createAlias = function(key, action) {
         SendToConsole(format("alias \"%s\" \"%s\"", key, action))
         SendToConsole(format("setinfo %s \"\"", key))
+        dev.log("The alias \"" + key + "\" was created")
     }
 }
