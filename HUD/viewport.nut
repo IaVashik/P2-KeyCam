@@ -10,7 +10,7 @@ viewerColors <- [
 ]
 
 function keyCamera::startDrawFrames() {
-    fprint("len: {}", viewerColors.len())
+    // fprint("len: {}", viewerColors.len())
     this._DrawFrames()   
 }
 

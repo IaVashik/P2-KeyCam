@@ -25,11 +25,16 @@ class keyCamera {
     function deleteLastKey() {}
     function clearKeyframes() {}
 
+    function setSpeed(units) {}
+    function setSpeedEx(units) {}
+    function getSpeed() {}
+
     function playCurrentProfile() {}
     function playAllProfiles() {}
     function stopPlayback() {}
 
     function createProfile() {}
+    function deleteProfile() {}
     function switchProfile() {}
 
     function startDrawFrames() {}
@@ -58,15 +63,35 @@ function keyCamera::addKeyframe() {
 }
 
 function keyCamera::deleteKey(idx) {
-    this.currentProfile.deleteFrame(idx)
+    this.currentProfile.removeFrame(idx)
 }
 
 function keyCamera::deleteLastKey() {
-    this.currentProfile.deleteFrame(currentProfileIdx)
+    this.currentProfile.keyframes.pop()
 }
 
 function keyCamera::clearKeyframes() {
     this.currentProfile.clearFrames()
+}
+
+/******************************************************************************
+*                                   SETTERS
+******************************************************************************/
+function keyCamera::setSpeed(units) {
+    this.cameraSpeed = units;
+    this.currentProfile.cameraSpeed = units;
+}
+
+function keyCamera::setSpeedEx(units) {
+    this.cameraSpeed = units;
+    foreach(profile in profiles) {
+        profile.cameraSpeed = units;
+    }
+}
+
+function getSpeed() {
+    printl(this.currentProfile.cameraSpeed)
+    return this.currentProfile.cameraSpeed
 }
 
 /******************************************************************************
@@ -77,13 +102,16 @@ function keyCamera::playCurrentProfile() {
     this.endDrawFrames()
     this._screenText.disable()
 
-    SendToConsole("DEMO_HideHud")
+    SendToConsole("KeyCam_HideHud")
     EntFireByHandle(this.cameraEnt, "Enable")
     this._startAnim()
 }
 
 function keyCamera::playAllProfiles() {
-    playAllProfile = true
+    this.playAllProfile = true
+    this.currentProfileIdx = 0
+    this.currentProfile = profiles[0]
+
     this.playCurrentProfile()
 }
 
@@ -91,8 +119,8 @@ function keyCamera::stopPlayback() {
     this.startDrawFrames()
     this._screenText.enable()
 
-    playAllProfile = false
-    SendToConsole("DEMO_ShowHud")
+    this.playAllProfile = false
+    SendToConsole("KeyCam_ShowHud")
     EntFireByHandle(this.cameraEnt, "Disable")
     if(eventIsValid("camera")) cancelScheduledEvent("camera")
 }
@@ -103,9 +131,11 @@ function keyCamera::stopPlayback() {
 
 function keyCamera::createProfile() {
     local newProfile = camProfile(this.cameraSpeed)
-    currentProfile = newProfile;
-    profiles.append(newProfile)
-    this.switchProfile()
+    this.currentProfile = newProfile;
+    this.currentProfileIdx = profiles.len()
+
+    profiles.append(newProfile);
+    this._screenText.changeText("Selected Profile: " + (currentProfileIdx + 1))
 }
 
 function keyCamera::switchProfile() {
@@ -152,12 +182,13 @@ function keyCamera::_startAnim() {
 function keyCamera::_cameraRecursion(infoTable) {
     local runAgain = function(infoTable) {
         local scope = this;
+        // printl(Time() + ", " + FrameTime())
         CreateScheduleEvent("camera", function():(scope, infoTable) {scope._cameraRecursion(infoTable)}, FrameTime())
     }
 
     if(infoTable.currentStep == infoTable.totalStep) {
         if(infoTable.endKey == currentProfile.getFramesLen() - 1) {
-            if(this.playAllProfile && currentProfileIdx < currentProfile.len() - 1) {
+            if(this.playAllProfile && currentProfileIdx < profiles.len() - 1) {
                 this.switchProfile()
                 return this._startAnim()
             }
