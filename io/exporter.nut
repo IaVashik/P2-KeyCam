@@ -1,20 +1,24 @@
-function export(name = "test") {
-    result <- "importKeyPoints(["
-    foreach(arr in profiles) {
-        result += "\n\t["
-        foreach(elements in arr) {
-            result += "\n\t\t{"
-            foreach(keyname, keyinfo in elements) {
-                result += keyname + " = " + format("Vector(%f, %f, %f)", keyinfo.x, keyinfo.y, keyinfo.z) + ", "
-            }
-            result = result.slice(0, -2) + "}"
+function keyCamera::exportProfiles(name = "test") {
+    SendToConsole(format("con_logfile cfg/demo_export_%s.log", name))
+
+    SendToConsole("script printl(\"\\nscript keyCam.profiles.clear()\")")
+    foreach(profile in this.profiles) {
+        SendToConsole("script printl(\"script keyCam.createProfile()\")")
+        foreach(frame in profile.keyframes) {
+            local origin = _vecToStr(frame.GetOrigin())
+            local angles = _vecToStr(frame.GetAngles())
+            local forward = _vecToStr( frame.GetForwardVector())
+
+            local command = "script keyCam.currentProfile.addFrame(keyframe(" + origin + ", " + angles + ", " + forward + "))"
+            SendToConsole("script printl(\"" + command + "\")")
         }
-        result += "\n], "
     }
-    result += "\n])"
-    
-    SendToConsole(format("con_logfile scripts/vscripts/demo_export_%s.log", name))
-    SendToConsole("script printl(result)")
+
     SendToConsole("con_logfile off")
-    // SendToConsole("clear; echo Done! :>")
+    SendToConsole("clear")
+    SendToConsole("script printl(\"The data has been successfully exported!\")")
+}
+
+function _vecToStr(vec) {
+    return format("Vector(%f, %f, %f)", vec.x, vec.y, vec.z)
 }
