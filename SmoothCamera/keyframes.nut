@@ -20,4 +20,20 @@ class keyframe {
     function GetForwardVector() {
         return this.forward
     }
+
+    function SetOrigin(vector) {
+        this.origin = vector
+    }
+
+    function SetAngles(vector) {
+        this.angle = vector
+    }
+
+    function SetForwardVector(vector) {
+        this.forward = vector
+    }
+
+    function _tostring() {
+        return "keyframe: " + origin
+    }
 }
