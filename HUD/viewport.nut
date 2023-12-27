@@ -28,10 +28,12 @@ function keyCamera::_DrawFrames() {
 
     foreach (idx, frame in frames) {
         local vector = frame.GetOrigin()
+        local forward = vector + frame.GetForwardVector() * 15
 
-        DebugDrawBox(vector, Vector(4,4,4), Vector(-4,-4,-4), 125, 125, 125, 100, 0.1)
+        DebugDrawBox(vector, Vector(4,4,4), Vector(-4,-4,-4), 125, 125, 125, 100, 0.15)
+        DebugDrawLine(vector, forward, 180, 230, 180, false, 0.15)
         
         if(idx != 0 && idx != frames_len) 
-            DebugDrawLine(currentProfile.getFrame(idx - 1).GetOrigin(), vector, color.x, color.y, color.z, false, 0.1)
+            DebugDrawLine(currentProfile.getFrame(idx - 1).GetOrigin(), vector, color.x, color.y, color.z, false, 0.15)
     }
 }

@@ -1,7 +1,7 @@
 class screenText {
     CBaseEntity = null; 
 
-    constructor(xPos, yPos, message) {
+    constructor(xPos, yPos, message, targetname = "") {
         this.CBaseEntity = entLib.CreateByClassname("game_text", {
             channel = 2,
             color = "170 170 170",
@@ -10,12 +10,12 @@ class screenText {
             fadein = 0,
             fadeout = 0,
             fxtime = 0,
-            holdtime = 100,
+            holdtime = 1000,
             x = xPos,
             y = yPos,
             spawnflags = 0,
             message = message,
-            targetname = "cucumber"
+            targetname = targetname
         })
     }
 
@@ -25,8 +25,10 @@ class screenText {
 
     function changeText(message) {}
 
+    function _tostring() {
+        return this.CBaseEntity
+    }
 }
-
 
 function screenText::enable() {
     EntFireByHandle(this.CBaseEntity, "Display")

@@ -1,4 +1,8 @@
 function keyCamera::exportProfiles(name = "test") {
+    if(currentProfile.getFramesLen() == 0) {
+        return printl("No data for export!")
+    }
+
     SendToConsole(format("con_logfile cfg/demo_export_%s.log", name))
 
     SendToConsole("script printl(\"\\nscript keyCam.profiles.clear()\")")
@@ -21,4 +25,10 @@ function keyCamera::exportProfiles(name = "test") {
 
 function _vecToStr(vec) {
     return format("Vector(%f, %f, %f)", vec.x, vec.y, vec.z)
+}
+
+function import(name = "test") {
+    SendToConsole("exec demo_export_" + name + ".log")
+    SendToConsole("clear")
+    SendToConsole("script printl(\"The data has been successfully imported!\")")
 }
