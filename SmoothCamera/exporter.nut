@@ -8,6 +8,7 @@ function keyCamera::exportProfiles(name = "test") {
     SendToConsole("script printl(\"\\nscript keyCam.profiles.clear()\")")
     foreach(profile in this.profiles) {
         SendToConsole("script printl(\"script keyCam.createProfile()\")")
+        SendToConsole("script printl(\"script keyCam.setSpeed("+ profile.getSpeed() + ")\")")
         foreach(frame in profile.keyframes) {
             local origin = _vecToStr(frame.GetOrigin())
             local angles = _vecToStr(frame.GetAngles())

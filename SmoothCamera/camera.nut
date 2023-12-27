@@ -105,6 +105,10 @@ function keyCamera::setSpeedEx(units) {
     this.updateHUD()
 }
 
+function keyCamera::getSpeed() {
+    return this.currentProfile.getSpeed()
+}
+
 /******************************************************************************
 *                            TODO BLYAT
 ******************************************************************************/
