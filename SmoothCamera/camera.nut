@@ -9,14 +9,20 @@ class keyCamera {
     currentProfileIdx = null;
     playAllProfile = false
 
-    _screenText = null;
+    cameraHUD = null;
+    gameui = null;
 
     constructor() {
-        this.cameraEnt = entLib.CreateByClassname("point_viewcontrol")
-        this._screenText = screenText(0.01, 0.95, "Selected Profile: 1")
+        this.cameraEnt = entLib.CreateByClassname("point_viewcontrol", {targetname = "cameraEnt"})
+
+        this.cameraHUD = screenText(0.01, 0.8, "")
+        this.cameraHUD.enable()
+
+        this.gameui = entLib.CreateByClassname("game_ui", {FieldOfView = -1, spawnflags = 128})
+        frameChangerInit(gameui)
+        
         this.createProfile()
 
-        this._screenText.enable()
         this.startDrawFrames()
     }
 
@@ -34,7 +40,8 @@ class keyCamera {
     function stopPlayback() {}
 
     function createProfile() {}
-    function deleteProfile() {}
+    function deleteProfile(idx) {}
+    function clearProfiles() {}
     function switchProfile() {}
 
     function startDrawFrames() {}
@@ -47,7 +54,10 @@ class keyCamera {
 }
 
 IncludeScript("P2-KeyCam/HUD/screen_text")
+IncludeScript("P2-KeyCam/HUD/screen_info")
 IncludeScript("P2-KeyCam/HUD/viewport")
+
+IncludeScript("P2-KeyCam/SmoothCamera/keyframes_editor")
 
 /******************************************************************************
 *                            TODO BLYAT
@@ -60,18 +70,22 @@ function keyCamera::addKeyframe() {
     local key = keyframe(origin, angle, forward)
 
     this.currentProfile.addFrame(key)
+    this.updateHUD()
 }
 
 function keyCamera::deleteKey(idx) {
     this.currentProfile.removeFrame(idx)
+    this.updateHUD()
 }
 
 function keyCamera::deleteLastKey() {
     this.currentProfile.keyframes.pop()
+    this.updateHUD()
 }
 
 function keyCamera::clearKeyframes() {
     this.currentProfile.clearFrames()
+    this.updateHUD()
 }
 
 /******************************************************************************
@@ -80,6 +94,7 @@ function keyCamera::clearKeyframes() {
 function keyCamera::setSpeed(units) {
     this.cameraSpeed = units;
     this.currentProfile.cameraSpeed = units;
+    this.updateHUD()
 }
 
 function keyCamera::setSpeedEx(units) {
@@ -87,11 +102,7 @@ function keyCamera::setSpeedEx(units) {
     foreach(profile in profiles) {
         profile.cameraSpeed = units;
     }
-}
-
-function getSpeed() {
-    printl(this.currentProfile.cameraSpeed)
-    return this.currentProfile.cameraSpeed
+    this.updateHUD()
 }
 
 /******************************************************************************
@@ -100,7 +111,7 @@ function getSpeed() {
 
 function keyCamera::playCurrentProfile() {
     this.endDrawFrames()
-    this._screenText.disable()
+    this.cameraHUD.disable()
 
     SendToConsole("KeyCam_HideHud")
     EntFireByHandle(this.cameraEnt, "Enable")
@@ -117,7 +128,7 @@ function keyCamera::playAllProfiles() {
 
 function keyCamera::stopPlayback() {
     this.startDrawFrames()
-    this._screenText.enable()
+    this.cameraHUD.enable()
 
     this.playAllProfile = false
     SendToConsole("KeyCam_ShowHud")
@@ -135,7 +146,7 @@ function keyCamera::createProfile() {
     this.currentProfileIdx = profiles.len()
 
     profiles.append(newProfile);
-    this._screenText.changeText("Selected Profile: " + (currentProfileIdx + 1))
+    this.updateHUD()
 }
 
 function keyCamera::switchProfile() {
@@ -152,7 +163,18 @@ function keyCamera::switchProfile() {
     }
 
     this.currentProfile = profiles[currentProfileIdx]
-    this._screenText.changeText("Selected Profile: " + (currentProfileIdx + 1))
+    this.updateHUD()
+}
+
+function keyCamera::deleteProfile(idx) {
+    this.profiles.remove(idx)
+    this.updateHUD()
+    this.switchProfile()
+}
+
+function keyCamera::clearProfiles() {
+    this.profiles.clear()
+    this.createProfile()
 }
 
 
@@ -182,7 +204,6 @@ function keyCamera::_startAnim() {
 function keyCamera::_cameraRecursion(infoTable) {
     local runAgain = function(infoTable) {
         local scope = this;
-        // printl(Time() + ", " + FrameTime())
         CreateScheduleEvent("camera", function():(scope, infoTable) {scope._cameraRecursion(infoTable)}, FrameTime())
     }
 
