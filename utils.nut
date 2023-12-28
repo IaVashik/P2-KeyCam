@@ -1,4 +1,3 @@
-
 utils <- {
     getShortestOrigin = function(startOrigin, endOrigin) {
         return Vector(endOrigin.x - startOrigin.x, 
@@ -23,5 +22,9 @@ utils <- {
         SendToConsole(format("alias \"%s\" \"%s\"", key, action))
         SendToConsole(format("setinfo %s \"\"", key))
         dev.log("The alias \"" + key + "\" was created")
+    },
+
+    vecToStr = function(vec) {
+        return format("Vector(%f, %f, %f)", vec.x, vec.y, vec.z)
     }
 }

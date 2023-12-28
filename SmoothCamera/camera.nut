@@ -1,66 +1,78 @@
 IncludeScript("P2-KeyCam/SmoothCamera/profile")
 IncludeScript("P2-KeyCam/SmoothCamera/keyframes")
 
+// Define the 'keyCamera' class which handles the cinematic camera system
 class keyCamera {
-    profiles = arrayLib.new();
-    cameraSpeed = 1;
-    cameraEnt = null;
-    currentProfile = null;
-    currentProfileIdx = null;
-    playAllProfile = false
+    profiles = arrayLib.new(); // Array to store camera profiles
+    cameraSpeed = 1; // Default camera speed
+    cameraEnt = null; // The entity representing the camera
+    currentProfile = null; // The currently active camera profile
+    currentProfileIdx = null; // Index of the current profile
 
-    cameraHUD = null;
-    gameui = null;
+    playAllProfile = false // Flag to control whether all profiles should be played sequentially
 
+    cameraHUD = null; // The camera's HUD (game_text) element
+    gameui = null; // Entity representing the game's user interface
+
+    // Constructor for the 'keyCamera' class
     constructor() {
+        // Create a camera entity
         this.cameraEnt = entLib.CreateByClassname("point_viewcontrol", {targetname = "cameraEnt"})
 
+        // Initialize the camera HUD with position and text
         this.cameraHUD = screenText(0.01, 0.8, "")
-        this.cameraHUD.enable()
+        this.cameraHUD.enable() // Enable the HUD for display
 
+        // Create a game UI entity with specific properties
         this.gameui = entLib.CreateByClassname("game_ui", {FieldOfView = -1, spawnflags = 128})
-        frameChangerInit(gameui)
+        frameChangerInit(gameui) // Initialize frame changer
         
-        this.createProfile()
+        this.createProfile() // Create an initial camera profile
 
-        this.startDrawFrames()
+        this.startDrawFrames() // Begin the process to draw frames onto the HUD
     }
 
-    function addKeyframe() {}
-    function deleteKey(idx) {}
-    function deleteLastKey() {}
-    function clearKeyframes() {}
+    // Keyframe management methods
+    function addKeyframe() null // Adds a new keyframe to the current profile
+    function deleteKey(idx) null // Deletes a keyframe at the specified index
+    function deleteLastKey() null // Deletes the last keyframe from the current profile
+    function clearKeyframes() null // Clears all keyframes from the current profile
+    function tryChangeFrame() bool // Activate the editor of the keyframe you are looking at
 
-    function setSpeed(units) {}
-    function setSpeedEx(units) {}
-    function getSpeed() {}
+    // Camera speed management methods
+    function setSpeed(units) null // Sets the speed of the camera movement
+    function setSpeedEx(units) null // Sets the speed of the camera movement for ALL profiles
+    function getSpeed() float // Returns the current speed of the camera
 
-    function playCurrentProfile() {}
-    function playAllProfiles() {}
-    function stopPlayback() {}
+    // Playback control methods
+    function playCurrentProfile() null // Plays current profile
+    function playAllProfiles() null // Plays all profiles sequentially
+    function stopPlayback() null // Stops the playback of keyframes
 
-    function createProfile() {}
-    function deleteProfile(idx) {}
-    function clearProfiles() {}
-    function switchProfile() {}
+    // Profile management methods
+    function createProfile() null // Creates a new camera movement profile
+    function deleteProfile(idx) null // Deletes the profile at the specified index
+    function clearProfiles() null // Clears all camera movement profiles
+    function switchProfile() null // Switches to a next camera movement profile
+    function exportProfiles(name) null // Saves all profiles to a file, you can import them using the command `script import(name)`
 
-    function startDrawFrames() {}
-    function endDrawFrames() {}
+    // Frame drawing methods
+    function startDrawFrames() null // Initiates the drawing of frames onto the HUD
+    function endDrawFrames() null // Ends the drawing of frames onto the HUD
 
-    // pseudo-private func
-    function _startAnim() {}
-    function _cameraRecursion(infoTable) {}
-    function _DrawFrames() {}
+    // Internal methods (not part of the public API and are meant for internal logic)
+    function _updateHUD() null // Update the information on the screen
+    function _startAnim() null // Begins the camera animation process
+    function _cameraRecursion(infoTable) null // Handles the recursive logic for camera movement
+    function _DrawFrames() null // Internal method for drawing frames
 }
 
 IncludeScript("P2-KeyCam/HUD/screen_text")
 IncludeScript("P2-KeyCam/HUD/screen_info")
 IncludeScript("P2-KeyCam/HUD/viewport")
 
-IncludeScript("P2-KeyCam/SmoothCamera/keyframes_editor")
-
 /******************************************************************************
-*                            TODO BLYAT
+*                            KEYFRAME MANAGEMENT
 ******************************************************************************/
 
 function keyCamera::addKeyframe() {
@@ -70,31 +82,32 @@ function keyCamera::addKeyframe() {
     local key = keyframe(origin, angle, forward)
 
     this.currentProfile.addFrame(key)
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::deleteKey(idx) {
     this.currentProfile.removeFrame(idx)
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::deleteLastKey() {
     this.currentProfile.keyframes.pop()
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::clearKeyframes() {
     this.currentProfile.clearFrames()
-    this.updateHUD()
+    this._updateHUD()
 }
 
 /******************************************************************************
 *                                   SETTERS
 ******************************************************************************/
+
 function keyCamera::setSpeed(units) {
     this.cameraSpeed = units;
     this.currentProfile.cameraSpeed = units;
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::setSpeedEx(units) {
@@ -102,7 +115,7 @@ function keyCamera::setSpeedEx(units) {
     foreach(profile in profiles) {
         profile.cameraSpeed = units;
     }
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::getSpeed() {
@@ -110,7 +123,7 @@ function keyCamera::getSpeed() {
 }
 
 /******************************************************************************
-*                            TODO BLYAT
+*                               PLAYBACK CONTROL
 ******************************************************************************/
 
 function keyCamera::playCurrentProfile() {
@@ -141,7 +154,7 @@ function keyCamera::stopPlayback() {
 }
 
 /******************************************************************************
-*                            TODO BLYAT
+*                                PROFILES CONTROL
 ******************************************************************************/
 
 function keyCamera::createProfile() {
@@ -150,13 +163,13 @@ function keyCamera::createProfile() {
     this.currentProfileIdx = profiles.len()
 
     profiles.append(newProfile);
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::switchProfile() {
     local Currentindex = currentProfileIdx
 
-    foreach(index, info in this.profiles){ //! BIG PROBLEM: NO _nexti
+    foreach(index, info in this.profiles){
         if (index > Currentindex) {
             this.currentProfileIdx = index
             break
@@ -167,12 +180,12 @@ function keyCamera::switchProfile() {
     }
 
     this.currentProfile = profiles[currentProfileIdx]
-    this.updateHUD()
+    this._updateHUD()
 }
 
 function keyCamera::deleteProfile(idx) {
     this.profiles.remove(idx)
-    this.updateHUD()
+    this._updateHUD()
     this.switchProfile()
 }
 
@@ -204,6 +217,7 @@ function keyCamera::_startAnim() {
 
     _cameraRecursion(infoTable)
 }
+
 
 function keyCamera::_cameraRecursion(infoTable) {
     local runAgain = function(infoTable) {
