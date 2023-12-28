@@ -91,27 +91,27 @@ function changeFrameRecurse(frame, playerPos) {
         
     } else if(modForAngles == true) {
         if(toRight) {
-            newAngles.y -= 0.5;
+            newAngles.y -= 0.2;
         }
 
         if(toLeft) {
-            newAngles.y += 0.5;
+            newAngles.y += 0.2;
         }
 
         if(toForward) {
-            newAngles.x -= 0.5;
+            newAngles.x -= 0.2;
         }
 
         if(toBackward) {
-            newAngles.x += 0.5;
+            newAngles.x += 0.2;
         }
 
         if(toUp) {
-            newAngles.z += 0.5;
+            newAngles.z += 0.2;
         }
 
         if(toDown) {
-            newAngles.z -= 0.5;
+            newAngles.z -= 0.2;
         }
     }
 
