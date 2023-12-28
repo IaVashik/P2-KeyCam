@@ -3,7 +3,7 @@ function keyCamera::tryChangeFrame() {
     local playerForward = eyePointEntity.GetForwardVector()
 
     local mutableFrame = null
-    foreach(frame in currentProfile.keyframes) { // TODO (currentProfile.keyframes) мб просто итератор ему ебануть?
+    foreach(frame in currentProfile) { //  (currentProfile.keyframes)
         if(checkIfPlayerLooksAtPoint(playerPos, playerForward, frame.GetOrigin())) {
             mutableFrame = frame
             break;
@@ -17,11 +17,15 @@ function keyCamera::tryChangeFrame() {
     EntFireByHandle(this.cameraEnt, "Enable")
 
     this.cameraEnt.SetOrigin(mutableFrame.GetOrigin())
-    this.cameraEnt.SetForwardVector(mutableFrame.GetForwardVector())
+    this.cameraEnt.SetAbsAngles(mutableFrame.GetAngles())
+    this.cameraEnt.SetUserData("mutableFrame", mutableFrame)
 
     toDown = false
     toUp = false
+
     changeFrameRecurse(mutableFrame, GetPlayer().GetOrigin())
+
+    return true
 }
 
 function checkIfPlayerLooksAtPoint(playerPos, playerForward, targetPoint) {
@@ -34,7 +38,7 @@ function checkIfPlayerLooksAtPoint(playerPos, playerForward, targetPoint) {
 
     local angle = acos(dotProduct / (playerForwardLength * directionToTargetLength))
 
-    return angle < 0.26 // maxViewAngle, ~15 градусов
+    return angle < 0.26 // maxViewAngle, ~15 angles
 }
 
 
@@ -87,37 +91,39 @@ function changeFrameRecurse(frame, playerPos) {
         
     } else if(modForAngles == true) {
         if(toRight) {
-            newAngles -= up
+            newAngles.y -= 0.5;
         }
-    
+
         if(toLeft) {
-            newAngles += up
+            newAngles.y += 0.5;
         }
 
         if(toForward) {
-            newAngles += Vector(0, 0.5, 0).Cross(forward) 
+            newAngles.x -= 0.5;
         }
 
         if(toBackward) {
-            newAngles -= Vector(0, 0.5, 0).Cross(forward)
+            newAngles.x += 0.5;
         }
 
         if(toUp) {
-            newAngles -= Vector(0.5, 0, 0)
+            newAngles.z += 0.5;
         }
 
         if(toDown) {
-            newAngles += Vector(0.5, 0, 0) 
+            newAngles.z -= 0.5;
         }
     }
 
-    keyCam.cameraEnt.SetOrigin(newPos)
+    keyCam.cameraEnt.SetOrigin(newPos)  // bruh
     keyCam.cameraEnt.SetAngles(newAngles.x, newAngles.y, newAngles.z)
-
+    
     frame.SetOrigin(newPos)
     frame.SetAngles(newAngles)
-    keyCam.updateHUD()
-    // frame.SetForwardVector(keyCam.cameraEnt.GetForwardVector())
+    frame.SetForwardVector(keyCam.cameraEnt.GetForwardVector())
+
+    if(modForAngles == false)
+        keyCam._updateHUD()
 }
 
 function stopChangeFrame() {
