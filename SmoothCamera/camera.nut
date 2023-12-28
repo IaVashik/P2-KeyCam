@@ -151,6 +151,8 @@ function keyCamera::stopPlayback() {
     SendToConsole("KeyCam_ShowHud")
     EntFireByHandle(this.cameraEnt, "Disable")
     if(eventIsValid("camera")) cancelScheduledEvent("camera")
+
+    EntFireByHandle(this.gameui, "Deactivate", "", 0.0, GetPlayer())
 }
 
 /******************************************************************************
@@ -184,7 +186,7 @@ function keyCamera::switchProfile() {
 }
 
 function keyCamera::deleteProfile(idx) {
-    this.profiles.remove(idx)
+    this.profiles.remove(idx - 1)
     this._updateHUD()
     this.switchProfile()
 }

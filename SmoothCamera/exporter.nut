@@ -32,12 +32,3 @@ function keyCamera::exportProfiles(name = "test") {
     SendToConsole("script printl(\"The data has been successfully exported!\")")
 }
 
-// Function to import camera profiles from a log file with an optional name parameter
-function import(name = "test") {
-    // Execute the log file with the specified name to import camera profiles
-    SendToConsole("exec keycam_export_" + name + ".log")
-    
-    // Clear the console and notify the user of successful import
-    SendToConsole("clear")
-    SendToConsole("script printl(\"The data has been successfully imported!\")")
-}

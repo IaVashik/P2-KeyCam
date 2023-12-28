@@ -13,7 +13,7 @@ function keyCamera::tryChangeFrame() {
     if(mutableFrame == null)
         return false
 
-    EntFireByHandle(this.gameui, "Activate", "", 0.0, player);
+    EntFireByHandle(this.gameui, "Activate", "", 0.0, GetPlayer());
     EntFireByHandle(this.cameraEnt, "Enable")
 
     this.cameraEnt.SetOrigin(mutableFrame.GetOrigin())
