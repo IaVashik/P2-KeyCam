@@ -1,5 +1,5 @@
 <div align="center">
-<img src="other\logo.png" alt="Logo"> <!-- width="660" height="350" -->
+<img src="https://i.ibb.co/ssPbccH/logo.png" alt="Logo"> <!-- width="660" height="350" -->
 
 <h2 align="center">
     <i>Making cinematic flythroughs easy!</i>
