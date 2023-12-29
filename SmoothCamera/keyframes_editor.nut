@@ -1,9 +1,14 @@
+//******************************************************************************
+//*                          EXPERIMENTAL FEATURE
+//******************************************************************************
+
+
 function keyCamera::tryChangeFrame() {
     local playerPos = eyePointEntity.GetOrigin()
     local playerForward = eyePointEntity.GetForwardVector()
 
     local mutableFrame = null
-    foreach(frame in currentProfile) { //  (currentProfile.keyframes)
+    foreach(frame in currentProfile) {
         if(checkIfPlayerLooksAtPoint(playerPos, playerForward, frame.GetOrigin())) {
             mutableFrame = frame
             break;
@@ -125,6 +130,7 @@ function changeFrameRecurse(frame, playerPos) {
     if(modForAngles == false)
         keyCam._updateHUD()
 }
+
 
 function stopChangeFrame() {
     EntFireByHandle(keyCam.cameraEnt, "Disable")

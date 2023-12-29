@@ -1,5 +1,6 @@
 // Function to export camera profiles to a file with an optional name parameter
 function keyCamera::exportProfiles(name = "test") {
+    
     // Check if there is no data to export
     if(profiles.len() == 1 && currentProfile.getFramesLen() == 0) {
         return printl("No data for export!") // Print an error message if there's nothing to export
@@ -10,10 +11,12 @@ function keyCamera::exportProfiles(name = "test") {
 
     // Write commands to clear existing profiles in the log file
     SendToConsole("script printl(\"\\nscript keyCam.profiles.clear()\")")
+    
     // Loop through each profile and write commands to create profiles and set speed
     foreach(profile in this.profiles) {
         SendToConsole("script printl(\"script keyCam.createProfile()\")")
         SendToConsole("script printl(\"script keyCam.setSpeed("+ profile.getSpeed() + ")\")")
+        
         // Loop through each frame in the profile and write commands to add keyframes
         foreach(frame in profile.keyframes) {
             local origin = utils.vecToStr(frame.GetOrigin())

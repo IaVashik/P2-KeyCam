@@ -2,7 +2,7 @@ IncludeScript("P2-KeyCam//pcapture-lib.nut")
 IncludeScript("P2-KeyCam/utils.nut")
 IncludeScript("P2-KeyCam/SmoothCamera/camera.nut")
 IncludeScript("P2-KeyCam/SmoothCamera/exporter.nut")
-IncludeScript("P2-KeyCam/SmoothCamera/keyframes_editor") // Experemental feature
+IncludeScript("P2-KeyCam/SmoothCamera/keyframes_editor") // Experimental feature
 
 SendToConsole("sv_alternateticks 0")
 
