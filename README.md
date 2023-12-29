@@ -60,6 +60,6 @@ Here's a quick reference table for the default key bindings:
 
 ## Credit
 
-P2-KeyCam was created by laVashik. When using P2-KeyCam in your videos or map projects, please credit me and include this script in your video/project description. This VScript depends on PCapture-Lib, which requires crediting the author (laVashik) if used in map for cutscenes.
+P2-KeyCam was created by laVashik. When using P2-KeyCam in your videos or projects, please credit me in your description. This VScript depends on PCapture-Lib, which requires crediting the author (laVashik) if used in map for cutscenes.
 
 Licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
