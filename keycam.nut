@@ -13,6 +13,12 @@ function export(name = "test") {
     keyCam.exportProfiles(name)
 }
 
+function import(name = "test") {
+    SendToConsole("exec demo_export_" + name + ".log")
+    SendToConsole("clear")
+    SendToConsole("script printl(\"The data has been successfully imported!\")")
+}
+
 function setSpeed(units) {
     keyCam.setSpeed(units)
 }
