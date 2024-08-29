@@ -14,9 +14,8 @@ function export(name = "test") {
 }
 
 function import(name = "test") {
-    SendToConsole("exec demo_export_" + name + ".log")
-    SendToConsole("clear")
-    SendToConsole("script printl(\"The data has been successfully imported!\")")
+    keyCam.profiles.clear()
+    SendToConsole("exec keycam_export_" + name + ".log")
 }
 
 function setSpeed(units) {
