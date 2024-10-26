@@ -1,12 +1,12 @@
 <div align="center">
-<img src="https://i.ibb.co/ssPbccH/logo.png" alt="Logo"> <!-- width="660" height="350" -->
+<img src="https://i.ibb.co/xXBbCJj/KeyCam2.png" alt="Logo"> <!-- width="660" height="350" -->
 
 <h2 align="center">
     <i>Making cinematic flythroughs easy!</i>
 </h2>
 </div>
 
-![version](https://img.shields.io/badge/P2--KeyCam-v1.0-informational)
+![version](https://img.shields.io/badge/P2--KeyCam-v2.0-informational)
 
 P2-KeyCam is a cinematic camera control tool for Portal 2, designed for crafting seamless camera flythroughs ideal for YouTube videos, level showcases, or highlighting gameplay moments. 
 With features like keyframe editing, profile management, real-time adjustments, and export/import capabilities, P2-KeyCam provides *unparalleled* control over your cinematic creations.
@@ -15,51 +15,109 @@ With features like keyframe editing, profile management, real-time adjustments, 
 
 To install P2-KeyCam:
 
-1. Download or clone the repository
-2. Copy the `P2-KeyCam` folder to `portal2/scripts/vscripts/`
-3. Copy `KeyCam.cfg` to `portal2/cfg/`
+1. Download or clone the repository.
+2. Copy the `P2-KeyCam` folder to `portal2/scripts/vscripts/`.
+3. Copy `KeyCam.cfg` to `portal2/cfg/`.
 4. Customize the key bindings in the config to suit your preferences.
 
-Here's a quick reference table for the default key bindings:
-| Command | Default Key | Description |
-|-|-|-|  
-| KeyCam_addKeyframe | mouse4 | Add keyframe at current camera position |
-| KeyCam_deleteLastKey | mouse5 | Delete last added keyframe |
-| KeyCam_clearFrames | 0 | Clear all keyframes in current profile |
-| KeyCam_EditFrame | 8 | Edit details of selected keyframe |
-| KeyCam_playCurrentProfile | 1 | Play back animation for current profile | 
-| KeyCam_playAllProfiles | 9 | Chain playback all profiles sequentially |
-| KeyCam_stopPlayback | 2 | Stop camera playback |
-| KeyCam_createPreset | Q | Create new camera profile preset |
-| KeyCam_switchProfile | 3 | Switch to different camera profile |
-| KeyCam_clearProfiles | - | Delete all existing profiles |
+### Running P2-KeyCam
 
-5. Load any map and execute the command `exec keycam` in the console.
-6. You're all set to capture cinematic footage!
-> **Tip**
-> For smoother animations, add `-tickrate 120` to your launch options. You may choose a higher value, but it's not recommended. Remember to remove this option when not using *P2-KeyCam* to avoid potential gameplay issues.
+Load any map and execute the command `exec KeyCam` in the console. You’re all set to capture cinematic footage!
 
+> **Tip**  
+> For smoother animations, add `-tickrate 124` to your launch options. If you don't set this, alternate ticks will be disabled as a compensation, which may lead to camera instability. Higher values can improve animation smoothness, but may affect gameplay.  
+> **FPS Calculation**: FPS of animations is calculated as `tickrate / 2`.
 
-## Additional Features
+### Key Bindings
 
-- ### **Profiles** 
-    - **Creation:** Create new camera movement presets with `KeyCam_createPreset`
-    - **Switching:** Quickly switch between profiles using `KeyCam_switchProfile`
-    - **Clearing:** Clear all existing profiles with `KeyCam_clearProfiles`
-    - **Selective Deletion:** If you need to delete just one specific profile that's no longer needed or if you made a mistake, use the command `script keyCam.deleteProfile(profile_idx)` in the console, where profile_idx is the index number of the profile you want to delete.
+Here’s a quick reference table for the default key bindings:
 
-- ### **Speed Customization** 
-    - Adjust playback speed for the current profile using `script keyCam.setSpeed(units)`
-    - Change playback speed globally across all profiles with `script keyCam.setSpeedEx(units)`
-    - Speed is set in units per tick. Higher values give smoother but faster camera movement
+| Command                     | Default Key | Description                                            |
+|-----------------------------|-------------|--------------------------------------------------------|
+| KeyCam_AddKeyframe          | mouse4      | Add keyframe at current camera position                |
+| KeyCam_DeleteLastKey        | mouse5      | Delete last added keyframe                             |
+| KeyCam_ClearFrames          | 0           | Clear all keyframes in current profile                 |
+| KeyCam_EditFrame            | 8           | Edit details of selected keyframe                      |
+| KeyCam_PlayCurrentProfile    | 1           | Play back animation for current profile                |
+| KeyCam_PlayAllProfiles      | 9           | Chain playback all profiles sequentially                |
+| KeyCam_StopPlayback         | 2           | Stop camera playback                                   |
+| KeyCam_CreatePreset         | Q           | Create new camera profile preset                       |
+| KeyCam_SwitchProfile        | 3           | Switch to different camera profile                     |
+| KeyCam_ClearProfiles        | -           | Delete all existing profiles                           |
+| KeyCam_HideHud             | N/A         | Hide HUD elements (crosshair, net_graph, etc.)        |
+| KeyCam_ShowHud             | N/A         | Show HUD elements                                      |
+| help_KeyCam                | N/A         | Display help information                               |
 
+### Additional Features
 
-- ### **Export and Import Functionality**
-    - **Export:** Save all your carefully crafted profiles and settings using the export command `script export(name)`. You can optionally specify a name for the file, otherwise, "test" is used by default. This is particularly useful for backing up your work or sharing with others.
-    - **Import:** If you need to move your camera profiles to another map or restore them after making changes, use `script import(name)` to bring them all back. Just make sure to use the same name you exported with to avoid any confusion. Remember that importing a profile with a name that already exists will overwrite the existing data, so use this feature with caution.
+P2-KeyCam offers a variety of console commands for advanced control and customization:
+
+- **Keyframe Management:**
+    - `script DeleteFrame(idx)`: Remove a specific keyframe by its index.
+
+- **Profile Management:**
+    - `script DeleteProfile(idx)`: Delete a specific profile by its index.
+
+- **Playback Control:**
+    - `script PlayProfile(idx)`: Play a specific profile by its index (useful for cutscenes).
+    - `script StopPlayback()`: Stop camera playback and restore HUD elements.
+
+- **Camera Settings:**
+    - `script SetSpeed(units)`: Set the camera movement speed for the current profile (units per tick).
+    - `script SetSpeedEx(units)`: Set the camera movement speed for all profiles (units per tick).
+    - `script SetLerp(lerpFunc)`: Set the interpolation function for smoother camera transitions (e.g., `script SetLerp(math.lerp.easeInOutQuad)`).
+    - `script GetSpeed()`: Get the current profile's camera speed.
+    - `script GetLerp()`: Get the current interpolation method as a string.
+
+- **Export/Import:**
+    - `script Export("test")`: Export all profiles and settings to a file named `demo_export_<name>.log`.
+    - `script Import("test")`: Import profiles and settings from a file named `demo_export_<name>.log`.
+
+- **Debugging:**
+    - `EnableBindHelper <0/1>` (in `KeyCam.cfg`): Enable/disable on-screen debugging information.
+
+### Using Keyframe Editor
+
+The Keyframe Editor allows you to modify camera keyframes in real-time. Here's how to use it:
+
+1. Call the `TryChangeFrame()` function to activate the editor.
+2. The editor will check if the player is looking at a keyframe. If so, it will allow you to edit its position and angles.
+3. Use the following controls to modify the keyframe:
+   - **Move Left/Right**: Adjusts the keyframe position or angle.
+   - **Move Forward/Backward**: Moves the keyframe in the specified direction.
+   - **Duck**: Toggles the downward adjustment for the keyframe position.
+   - **Jump**: Inverts the downward adjustment.
+
+4. To exit the editor, press the "Attack2"/"Use" button.
+
+The editor updates the camera's position and angles based on your adjustments, allowing for precise control over cutscenes.
+
+**Note**: The spacebar is used to invert the `toDown` movement.
+
+### Using P2-KeyCam for Cutscenes
+
+P2-KeyCam can also be utilized in your maps for cutscenes. Here’s a quick guide:
+
+1. **Setup:** Load your map, launch KeyCam, set keyframes, create profiles, and configure everything as needed.
+2. **Export:** Export your setup using the `script Export("mycutscene")` command, replacing "mycutscene" with your desired filename.
+3. **Integration:** In your map's vscript, include the following code:
+
+```squirrel
+::NoHud <- true // Disables HUD elements during the cutscene
+IncludeScript("p2-keycam/keycam")
+Import("mycutscene")
+
+function MyFunc() {
+    PlayProfile(1) // Play the first profile (adjust index as needed) 
+                   // IMPORTANT: Do not play animations immediately after including the script.
+                   // Allow at least 0.3 seconds for the Import to complete.
+}
+```
+
+Now you can play animations using any of the track functions: `PlayCurrentProfile`, `PlayProfile`, or `PlayAllProfiles`.
 
 ## Credit
 
-P2-KeyCam was created by laVashik. When using P2-KeyCam in your videos or projects, please credit me in your description. This VScript depends on PCapture-Lib, which requires crediting the author (laVashik) if used in map for cutscenes.
+P2-KeyCam was created by laVashik. Credit is *required* when using P2-KeyCam in your videos or projects. I respect content creators, and I appreciate you respecting my work as well. This VScript depends on PCapture-Lib, which also requires crediting the author (laVashik) if used in maps for cutscenes.
 
 Licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
