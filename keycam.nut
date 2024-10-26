@@ -1,4 +1,4 @@
-IncludeScript("pcapture-lib/src/pcapture-lib") // I LOVE U!
+IncludeScript("P2-KeyCam/PCapture-Lib") // I LOVE U!
 
 IncludeScript("P2-KeyCam/core/keyframes.nut")
 IncludeScript("P2-KeyCam/core/profile.nut")
