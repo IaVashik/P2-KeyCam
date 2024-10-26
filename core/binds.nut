@@ -4,17 +4,17 @@ function CreateAlias(key, action) {
     dev.info("The alias \"" + key + "\" was created")
 }
 
-::binds <- {}
+::binds <- []
 function bind(key, action) {
     if(key == "") return
     SendToConsole(format("bind \"%s\" \"%s\"", key, action))
-    binds[key] <- action
+    binds.append([key, action]) 
 }
 
 function _getBinds() {
     local message = ""
-    foreach(bind, action in binds) 
-        message += bind + " - " + action + "\n"
+    foreach(kv in binds) 
+        message += kv[0] + " - " + kv[1] + "\n"
     
     return message
 }

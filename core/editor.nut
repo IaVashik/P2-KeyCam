@@ -100,6 +100,7 @@ function FrameEditor(frame) {
     info += "\nPoint Angles: " + newAngles
     info += "\nPosition Offset: " + posOffset
     info += "\nAngles Offset: " + anglesOffset
+    info += "\nPress \"Attack1\" for switch mode."
     info += "\nPress \"Attack2\" for exit.\n\n\n\n\n\n\n\n\n"
 
     UpdateHudInfo(info)
