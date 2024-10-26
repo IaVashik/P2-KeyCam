@@ -8,6 +8,9 @@
 
 ![version](https://img.shields.io/badge/P2--KeyCam-v1.0-informational)
 
+> [!WARNING]  
+> This branch is deprecated and contains critical bugs that can severely impact performance, including significant FPS drops during animations. Please use version 2.0 instead for a stable and optimized experience
+
 P2-KeyCam is a cinematic camera control tool for Portal 2, designed for crafting seamless camera flythroughs ideal for YouTube videos, level showcases, or highlighting gameplay moments. 
 With features like keyframe editing, profile management, real-time adjustments, and export/import capabilities, P2-KeyCam provides *unparalleled* control over your cinematic creations.
 
