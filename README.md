@@ -73,26 +73,25 @@ P2-KeyCam offers a variety of console commands for advanced control and customiz
     - `script Export("test")`: Export all profiles and settings to a file named `demo_export_<name>.log`.
     - `script Import("test")`: Import profiles and settings from a file named `demo_export_<name>.log`.
 
-- **Debugging:**
+- **User Helper:**
     - `EnableBindHelper <0/1>` (in `KeyCam.cfg`): Enable/disable on-screen debugging information.
 
 ### Using Keyframe Editor
 
 The Keyframe Editor allows you to modify camera keyframes in real-time. Here's how to use it:
 
-1. Call the `TryChangeFrame()` function to activate the editor.
+1. Call the `TryChangeFrame()` function or use the bind to activate the editor.
 2. The editor will check if the player is looking at a keyframe. If so, it will allow you to edit its position and angles.
 3. Use the following controls to modify the keyframe:
    - **Move Left/Right**: Adjusts the keyframe position or angle.
    - **Move Forward/Backward**: Moves the keyframe in the specified direction.
    - **Duck**: Toggles the downward adjustment for the keyframe position.
    - **Jump**: Inverts the downward adjustment.
+   - **Attack1**: Toggle between editing camera position and angles
 
-4. To exit the editor, press the "Attack2"/"Use" button.
+4. To exit the editor, press the `Attack2`/`Use` button.
 
 The editor updates the camera's position and angles based on your adjustments, allowing for precise control over cutscenes.
-
-**Note**: The spacebar is used to invert the `toDown` movement.
 
 ### Using P2-KeyCam for Cutscenes
 
@@ -103,7 +102,7 @@ P2-KeyCam can also be utilized in your maps for cutscenes. Here’s a quick guid
 3. **Integration:** In your map's vscript, include the following code:
 
 ```squirrel
-::NoHud <- true // Disables HUD elements during the cutscene
+::NoHud <- true // Disables all KeyCam HUD elements (bool flag)
 IncludeScript("p2-keycam/keycam")
 Import("mycutscene")
 
