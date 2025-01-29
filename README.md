@@ -26,7 +26,6 @@ Load any map and execute the command `exec KeyCam` in the console. You’re all 
 
 > **Tip**  
 > For smoother animations, add `-tickrate 124` to your launch options. If you don't set this, alternate ticks will be disabled as a compensation, which may lead to camera instability. Higher values can improve animation smoothness, but may affect gameplay.  
-> **FPS Calculation**: FPS of animations is calculated as `tickrate / 2`.
 
 ### Key Bindings
 

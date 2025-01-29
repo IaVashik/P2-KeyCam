@@ -25,6 +25,7 @@ function UpdateHudInfo(additionalText = null) {
     }
     info += "\nAnim Time: " + needTime
 
+    // TODO broken!!!
     if(!additionalText && "EnableBindHelper" in getroottable() && EnableBindHelper)
         additionalText = _getBinds() + "For more information, use help_KeyCam." + "\n\n\n\n\n\n\n\n\n"
     

@@ -34,11 +34,7 @@ function Init() {
     ::playerEx <- GetPlayerEx()
     CreateProfile() // Create an initial camera profile
 
-    if(FrameTime() > 0.03) {
-        dev.warning("Alternate ticks disabled! Be careful")
-        SendToConsole("sv_alternateticks 0")
-    }
-        
+    SendToConsole("sv_alternateticks 0")
     StartDrawFrames() // Begin the process to draw frames onto the HUD
     UpdateHudInfo()
 }

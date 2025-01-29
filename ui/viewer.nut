@@ -1,12 +1,12 @@
 viewerColors <- [
-    Vector(240, 128, 128),  // светло-красный
-    Vector(123, 104, 238),  // средне-фиолетовый
-    Vector(255, 165, 30),    // оранжевый
-    Vector(135, 206, 235),  // светло-голубой
-    Vector(60, 179, 113),   // средне-зеленый
-    Vector(255, 228, 181),  // светло-бежевый (персиковый)
-    Vector(218, 165, 32),   // золотой
-    Vector(238, 130, 238)   // светло-розовый (фиолетовый)
+    Vector(240, 128, 128),  // light red
+    Vector(123, 104, 238),  // medium purple
+    Vector(255, 165, 30),   // orange
+    Vector(135, 206, 235),  // light blue
+    Vector(60, 179, 113),   // medium green
+    Vector(255, 228, 181),  // light beige (peach)
+    Vector(218, 165, 32),   // golden
+    Vector(238, 130, 238)   // light pink (violet)
 ]
 
 function StartDrawFrames() {

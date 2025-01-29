@@ -26,7 +26,7 @@ function TryChangeFrame() {
     toDown = false; inverted = false
 
     ScheduleEvent.AddInterval("FrameChanger", FrameEditor, FrameTime(), 0, [mutableFrame])
-    ScheduleEvent.AddInterval("FrameChanger", playerEx.SetOrigin, 0.1, 0, [playerPos], playerEx)
+    ScheduleEvent.AddInterval("FrameChanger", playerEx.SetOrigin, 0.1, 0, [playerEx.GetOrigin()], playerEx)
 }
 
 function checkIfPlayerLooksAtPoint(playerPos, playerForward, targetPoint) {
@@ -95,11 +95,9 @@ function FrameEditor(frame) {
     frame.SetAngles(newAngles)
     frame.SetForwardVector(camera.GetForwardVector())
 
-    local info = "You are currently editing: camera " + (modForAngles ? "angle" : "position")
-    info += "\nPoint Position: " + newPos
-    info += "\nPoint Angles: " + newAngles
-    info += "\nPosition Offset: " + posOffset
-    info += "\nAngles Offset: " + anglesOffset
+    local info = "You are currently editing: " + (modForAngles ? "angle" : "position")
+    info += "\nPosition: " + newPos
+    info += "\nAngles: " + newAngles
     info += "\nPress \"Attack1\" for switch mode."
     info += "\nPress \"Attack2\" for exit.\n\n\n\n\n\n\n\n\n"
 
@@ -119,27 +117,27 @@ function createGameUi() {
     local gameui = entLib.CreateByClassname("game_ui", {FieldOfView = -1, spawnflags = 128})
     beep <- HUD.ScreenText(Vector(0, RandomFloat(0.8, 0.95)), "·", 99999).SetColor("100 0 50")  // shhhh...˙
 
-    gameui.addOutput("PlayerOff", "worldspawn", "RunScriptCode", "stopChangeFrame()")
-    gameui.addOutput("PressedAttack2", "worldspawn", "RunScriptCode", "stopChangeFrame()")
-    gameui.addOutput("PressedAttack", "worldspawn", "RunScriptCode", "modForAngles = !modForAngles")
+    gameui.AddOutput("PlayerOff", "worldspawn", "RunScriptCode", "stopChangeFrame()")
+    gameui.AddOutput("PressedAttack2", "worldspawn", "RunScriptCode", "stopChangeFrame()")
+    gameui.AddOutput("PressedAttack", "worldspawn", "RunScriptCode", "modForAngles = !modForAngles")
 
-    gameui.addOutput("PressedMoveLeft", "worldspawn", "RunScriptCode", "toLeft = true")
-    gameui.addOutput("UnPressedMoveLeft", "worldspawn", "RunScriptCode", "toLeft = false")
+    gameui.AddOutput("PressedMoveLeft", "worldspawn", "RunScriptCode", "toLeft = true")
+    gameui.AddOutput("UnPressedMoveLeft", "worldspawn", "RunScriptCode", "toLeft = false")
     
-    gameui.addOutput("PressedMoveRight", "worldspawn", "RunScriptCode", "toRight = true")
-    gameui.addOutput("UnPressedMoveRight", "worldspawn", "RunScriptCode", "toRight = false")
+    gameui.AddOutput("PressedMoveRight", "worldspawn", "RunScriptCode", "toRight = true")
+    gameui.AddOutput("UnPressedMoveRight", "worldspawn", "RunScriptCode", "toRight = false")
 
-    gameui.addOutput("PressedForward", "worldspawn", "RunScriptCode", "toForward = true")
-    gameui.addOutput("UnPressedForward", "worldspawn", "RunScriptCode", "toForward = false")
+    gameui.AddOutput("PressedForward", "worldspawn", "RunScriptCode", "toForward = true")
+    gameui.AddOutput("UnPressedForward", "worldspawn", "RunScriptCode", "toForward = false")
 
-    gameui.addOutput("PressedBack", "worldspawn", "RunScriptCode", "toBackward = true")
-    gameui.addOutput("UnPressedBack", "worldspawn", "RunScriptCode", "toBackward = false")
+    gameui.AddOutput("PressedBack", "worldspawn", "RunScriptCode", "toBackward = true")
+    gameui.AddOutput("UnPressedBack", "worldspawn", "RunScriptCode", "toBackward = false")
 
     local playerproxy = entLib.CreateByClassname("logic_playerproxy")
-    playerproxy.addOutput("OnDuck", "worldspawn", "RunScriptCode", "toDown = true")
-    playerproxy.addOutput("OnUnDuck", "worldspawn", "RunScriptCode", "toDown = false")
+    playerproxy.AddOutput("OnDuck", "worldspawn", "RunScriptCode", "toDown = true")
+    playerproxy.AddOutput("OnUnDuck", "worldspawn", "RunScriptCode", "toDown = false")
 
-    playerproxy.addOutput("OnJump", "worldspawn", "RunScriptCode", "inverted = !inverted")
+    playerproxy.AddOutput("OnJump", "worldspawn", "RunScriptCode", "inverted = !inverted")
 
     return gameui
 }
